@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -10,15 +11,29 @@ namespace NLogStructuredLogging
 
         static void Main(string[] _)
         {
-            logger.Info("This is a structured log with primitives. Properties: {Text} {Number}", 
-                "MyText", 49);
+            var anonymousObject = new { Id = 1, Timestamp = DateTime.UtcNow, Tag = "tag1" };
 
-            logger.Info("This is a structured log with a complex object. Properties: {}", 
-                new { Id = 1, Timestamp = DateTime.UtcNow, Tag = "tag1" });
+            var complexObject = new ComplexObject
+            {
+                Labels = new[] { "Label1", "Label2" },
+                Configuration = new Dictionary<string, object>()
+                {
+                        { "Foo", 1 },
+                        { "Bar", "One" }
+                },
+                Child = new ComplexObjectChild
+                {
+                    SomeProp = 1,
+                }
+            };
+
+            logger.Info("Here are some primitives: {Text} {Number}", "MyText", 49);
+            logger.Info("Here is an anonymous object: {}", anonymousObject);
+            logger.Info("Here is a complex object: {@ComplexObject}", complexObject);
 
             try
             {
-                throw new InvalidOperationException("This is a structured log with an exception");
+                throw new InvalidOperationException("Here is an exception");
             }
             catch (InvalidOperationException ex)
             {
